@@ -1,0 +1,174 @@
+<?php
+
+/**
+ * @file
+ * Builds scaffolding for Openfed Orejime integration.
+ */
+
+/**
+ * Implements hook_libraries_info().
+ */
+function openfed_orejime_libraries_info() {
+  $libraries['orejime'] = array(
+    'name' => 'Openfed Orejime library',
+    'vendor url' => 'https://github.com/openfed/orejime',
+    'download url' => 'https://github.com/openfed/orejime',
+    'version arguments' => array(
+      'file' => 'dist/orejime.js',
+      'pattern' => '@orejime v([\d\.]+)@',
+      'lines' => 1
+    ),
+    'files' => array(
+      'js' => array(
+        'dist/orejime.js'
+      ),
+      'css' => array(
+        'dist/orejime.css'
+      ),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function openfed_orejime_menu() {
+  $items['admin/config/system/openfed_orejime'] = array(
+    'title' => 'Openfed Orejime',
+    'description' => t('Manage Orejime config object settings.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('openfed_orejime_admin_settings'),
+    'file' => 'includes/openfed_orejime.admin.inc',
+    'access arguments' => array('access openfed orejime'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_permission().
+ */
+function openfed_orejime_permission() {
+  return array(
+    'access openfed orejime' => array(
+      'title' => t('Access openfed orejime'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_page_build().
+ *
+ * Attach Orejime base library.
+ * Attach Google Analytics Web Property ID to Drupal.settings.
+ * Attach Privacy Policy URLS to Drupal.settings, coming from config form.
+ * Attach custom JS responsible for initializing Orejime.
+ */
+function openfed_orejime_page_build(&$page) {
+  if (!path_is_admin(current_path()) && variable_get('orejime_config_file', 0)) {
+    global $language;
+
+    $info = libraries_detect('orejime');
+    if ($info['installed'] === FALSE) {
+      drupal_set_message(t('Orejime library not installed. Download it from <a href="@orejime-url" target="_blank">the official page</a>. 
+        This module expects the library to be at sites/all/libraries/orejime, with a sub-directory "dist" containing the following files: dis/orejime.js 
+        and dis/orejime.css.', array('@orejime-url' => $info['download url'])), 'error');
+      return;
+    }
+    $page['page_top']['#attached']['libraries_load'][] = array('orejime');
+
+    $policy_url = variable_get('privacy_policy_' . $language->language, FALSE);
+    $ga_id = variable_get('googleanalytics_account', FALSE);
+    $page['page_bottom']['#attached']['js'] = array(
+      array(
+        'type' => 'setting',
+        'data' => array('openfed_orejime' => array('GTM_UA' => $ga_id ? $ga_id : FALSE)),
+      ),
+      array(
+        'type' => 'setting',
+        'data' => array('openfed_orejime' => array('privacy_policy_url' => $policy_url)),
+      ),
+      file_create_url('public://openfed_orejime/orejime-config.js') => array(
+        'type' => 'file',
+        'scope' => 'footer',
+        'preprocess' => false,
+      ),
+      drupal_get_path('module', 'openfed_orejime') . '/js/openfed-orejime.js' => array(
+        'type' => 'file',
+        'scope' => 'footer',
+      ),
+    );
+  }
+}
+
+/**
+ * We have to prevent aggregation on Orejime managed scripts otherwise openfed_orejime_preprocess_html_tag()
+ * won't be able to modify data attributes on the generated src.
+ *
+ * Implements hook_js_alter().
+ */
+function openfed_orejime_js_alter(&$javascript) {
+  foreach ($javascript as $path => &$script) {
+    switch (TRUE) {
+      case is_string($script['data']) && strpos($script['data'], 'GoogleAnalyticsObject') > 0:
+      case strpos($path, 'google_analytics') > 0:
+      case strpos($path, 'google_tag') > 0:
+        $script['preprocess'] = false;
+        break;
+    }
+  }
+}
+
+/**
+ * The markup produced by drupal_get_js() is restricted, instead it uses
+ * theme_html_tag(). Therefore we are limited to pre-processing script tag
+ * elements to add data attributes.
+ *
+ * Implements hook_preprocess_html_tag().
+ */
+function openfed_orejime_preprocess_html_tag(&$vars) {
+  if ($vars['element']['#tag'] === 'script') {
+    switch (TRUE) {
+      case isset($vars['element']['#value']) && strpos($vars['element']['#value'], 'GoogleAnalyticsObject') > 0:
+        $attributes = array(
+          'type' => 'opt-in',
+          'data-type' => 'application/javascript',
+          'data-name' => 'google-analytics',
+        );
+        break;
+
+      case isset($vars['element']['#attributes']['src']) && strpos($vars['element']['#attributes']['src'], 'google_analytics') > 0:
+        $attributes = array(
+          'type' => 'opt-in',
+          'data-type' => 'application/javascript',
+          'data-name' => 'google-analytics',
+          'data-src' => $vars['element']['#attributes']['src'],
+        );
+        unset($vars['element']['#attributes']['src']);
+        break;
+
+      case isset($vars['element']['#attributes']['src']) && strpos($vars['element']['#attributes']['src'], 'google_tag') > 0:
+        $attributes = array(
+          'type' => 'opt-in',
+          'data-type' => 'application/javascript',
+          'data-name' => 'google-tag-manager',
+          'data-src' => $vars['element']['#attributes']['src'],
+        );
+        unset($vars['element']['#attributes']['src']);
+        break;
+    }
+
+    // Set attributes.
+    if (!empty($attributes)) {
+      if (isset($vars['element']['#attributes'])) {
+        $vars['element']['#attributes'] = array_merge($vars['element']['#attributes'], $attributes);
+      }
+      else {
+        $vars['element']['#attributes'] = $attributes;
+      }
+    }
+  }
+}
