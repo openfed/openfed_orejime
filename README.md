@@ -39,9 +39,8 @@ INSTALLATION
 2. Follow the installation instructions of Orejime.
    Link: https://github.com/openfed/orejime
    
-3. After running "npm run build" process of Orejime you should have generated JS/CSS files within the "dist" directory.
-   Create a new directory called "orejime" in the "libraries" root folder and copy the directory "dist" inside.
-   Make sure the path to the plugin file becomes:
+3. After running "npm run build" process of Orejime lib you should have generated JS/CSS files within the "dist" directory.
+   In your Drupal installation create a new directory called "orejime" in the "libraries" root folder and from the Orejime      lib copy the directory "dist" inside. Make sure the path to the plugin file becomes:
    "libraries/orejime/dist/orejime.js" and "libraries/orejime/dist/orejime.css"
 
 4. Go to "Administer" -> "Extend" and enable the Openfed Orejime module.
