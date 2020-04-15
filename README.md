@@ -34,7 +34,7 @@ INSTALLATION
 ------------
 
 1. Install the module as normal, see link for instructions.
-   Link: https://www.drupal.org/documentation/install/modules-themes/modules-8
+   Link: https://www.drupal.org/documentation/install/modules-themes/modules-7
 
 2. Follow the installation instructions of Orejime
    Link: https://github.com/openfed/orejime
