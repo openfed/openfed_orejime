@@ -91,7 +91,7 @@ function openfed_orejime_page_build(&$page) {
         'type' => 'setting',
         'data' => array('openfed_orejime' => array('privacy_policy_url' => $policy_url)),
       ),
-      file_create_url('public://openfed_orejime/orejime-config.js') => array(
+      variable_get('file_public_path', conf_path() . '/files') . '/openfed_orejime/orejime-config.js' => array(
         'type' => 'file',
         'scope' => 'footer',
         'preprocess' => false,
