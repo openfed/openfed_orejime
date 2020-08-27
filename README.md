@@ -1,5 +1,4 @@
-WARNING: This repo has been moved to Drupal.org - https://www.drupal.org/project/orejime_openfed
-
+WARNING: Further development will occur on Drupal.org - https://www.drupal.org/project/orejime_openfed.
 
 CONTENTS OF THIS FILE
 ---------------------
