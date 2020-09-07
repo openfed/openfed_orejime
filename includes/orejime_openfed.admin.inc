@@ -8,8 +8,8 @@
 /**
  * Admin settings page.
  */
-function openfed_orejime_admin_settings($form, &$form_state) {
-  $dir = 'public://openfed_orejime';
+function orejime_openfed_admin_settings($form, &$form_state) {
+  $dir = 'public://orejime_openfed';
   $languages = language_list();
 
   if (!empty($languages)) {
@@ -33,15 +33,15 @@ function openfed_orejime_admin_settings($form, &$form_state) {
     '#default_value' => variable_get('orejime_config_file', 0),
   );
 
-  $form['#submit'][] = 'openfed_orejime_process_submission_form_submit';
+  $form['#submit'][] = 'orejime_openfed_process_submission_form_submit';
 
   return system_settings_form($form);
 }
 
 /**
- * Submit handler for openfed_orejime_admin_settings().
+ * Submit handler for orejime_openfed_admin_settings().
  */
-function openfed_orejime_process_submission_form_submit($form, &$form_state) {
+function orejime_openfed_process_submission_form_submit($form, &$form_state) {
   $current_file_set = variable_get('orejime_config_file', 0);
   $file_to_upload = $form_state['values']['orejime_config_file'];
 
@@ -52,12 +52,12 @@ function openfed_orejime_process_submission_form_submit($form, &$form_state) {
         return;
       }
       // Remove existing file before adding.
-      openfed_orejime_settings_remove_managed_file($current_file_set);
+      orejime_openfed_settings_remove_managed_file($current_file_set);
     }
     try {
       // Save the file and move to the correct directory.
       global $user;
-      $dir = 'public://openfed_orejime';
+      $dir = 'public://orejime_openfed';
       $filename = 'orejime-config.js';
       $file = file_load($file_to_upload);
       $file->filename = $filename;
@@ -65,7 +65,7 @@ function openfed_orejime_process_submission_form_submit($form, &$form_state) {
       if (!file_move($file, $dir . '/' . $filename, FILE_EXISTS_REPLACE)) {
         throw new Exception('Failed to move file to ' . $dir);
       }
-      file_usage_add($file, 'openfed_orejime', 'user', $user->uid);
+      file_usage_add($file, 'orejime_openfed', 'user', $user->uid);
     } catch (Exception $e) {
       drupal_set_message($e->getMessage(), 'error');
     }
@@ -73,20 +73,20 @@ function openfed_orejime_process_submission_form_submit($form, &$form_state) {
   }
   // Remove the file if we don't have any upload attached.
   elseif ($current_file_set) {
-    openfed_orejime_settings_remove_managed_file($current_file_set);
+    orejime_openfed_settings_remove_managed_file($current_file_set);
   }
 }
 
 /**
  * Helper function to remove the managed file process by
- * openfed_orejime_process_submission_form_submit().
+ * orejime_openfed_process_submission_form_submit().
  *
  * @param $fid
  */
-function openfed_orejime_settings_remove_managed_file($fid) {
+function orejime_openfed_settings_remove_managed_file($fid) {
   variable_del('orejime_config_file');
   if ($file_to_delete = file_load($fid)) {
-    file_usage_delete($file_to_delete, 'openfed_orejime');
+    file_usage_delete($file_to_delete, 'orejime_openfed');
     file_delete($file_to_delete);
   }
 }

@@ -8,7 +8,7 @@
     if (!initialized) {
       if (typeof orejimeConfig !=='undefined') {
         initialized = true;
-        const privacyurl = settings.openfed_orejime.privacy_policy_url;
+        const privacyurl = settings.orejime_openfed.privacy_policy_url;
         if (privacyurl) orejimeConfig.privacyPolicy = privacyurl;
         Orejime.init(orejimeConfig);
       }

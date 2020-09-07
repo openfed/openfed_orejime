@@ -1,9 +1,0 @@
-name = Openfed Orejime
-description = Integrates Orejime JavaScript library into Drupal.
-package = Openfed
-core = 7.x
-
-dependencies[] = libraries
-
-files[] = openfed_orejime.module
-files[] = includes/openfed_orejime.admin.inc

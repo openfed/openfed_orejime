@@ -15,8 +15,8 @@ var orejimeConfig = {
         "__utmc",
         "__utmt",
         "__utmz",
-        "_gat_gtag_" + Drupal.settings.openfed_orejime.GTM_UA,
-        "_gat_" + Drupal.settings.openfed_orejime.GTM_UA
+        "_gat_gtag_" + Drupal.settings.orejime_openfed.GTM_UA,
+        "_gat_" + Drupal.settings.orejime_openfed.GTM_UA
       ],
       purposes: ["analytics"],
       callback: function(consent, app){
@@ -40,7 +40,7 @@ var orejimeConfig = {
         "__utmt",
         "__utmz",
         "AMP_TOKEN",
-        "_gac_" + Drupal.settings.openfed_orejime.GTM_UA
+        "_gac_" + Drupal.settings.orejime_openfed.GTM_UA
       ],
       purposes: ["analytics"],
       callback: function(consent, app){

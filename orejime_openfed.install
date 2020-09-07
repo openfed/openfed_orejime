@@ -1,20 +1,20 @@
 <?php
 /**
  * @file
- * Install, update and uninstall functions for the openfed_orejime module.
+ * Install, update and uninstall functions for the orejime_openfed module.
  */
 
 /**
  * Implements hook_requirements().
  */
-function openfed_orejime_requirements($phase) {
+function orejime_openfed_requirements($phase) {
   $requirements = array();
   $t = get_t();
 
   if ($phase == 'runtime') {
     $orejime = libraries_detect('orejime');
     $requirements['orejime'] = array(
-      'title' => $t('Openfed Orejime library'),
+      'title' => $t('Orejime Openfed library'),
     );
     if ($orejime['installed']) {
       $requirements['orejime']['value'] = $orejime['version'];

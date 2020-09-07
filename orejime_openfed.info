@@ -1,0 +1,9 @@
+name = Orejime Openfed
+description = Integrates Orejime JavaScript library into the OpenFed distribution
+package = Openfed
+core = 7.x
+
+dependencies[] = libraries
+
+files[] = orejime_openfed.module
+files[] = includes/orejime_openfed.admin.inc
